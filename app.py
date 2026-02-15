@@ -12,7 +12,10 @@ from models import Database
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'ceitec-hub-secret-key-2024')
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# Configuração de caminhos absolutos
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static', 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
 # Garantir que pasta de uploads existe
