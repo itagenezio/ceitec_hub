@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Competição Matemática - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h1>🧮 Competição Matemática</h1>
+
+    <div class="level-selector">
+        <button class="level-btn active" data-level="facil">Fácil (10pts)</button>
+        <button class="level-btn" data-level="medio">Médio (20pts)</button>
+        <button class="level-btn" data-level="dificil">Difícil (30pts)</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="question-box">
+            <p class="question-text" id="questionText">Clique em "Nova Questão" para começar!</p>
+        </div>
+
+        <div class="answer-section" id="answerSection" style="display: none;">
+            <input type="number" id="answerInput" placeholder="Sua resposta">
+            <button class="btn btn-primary" onclick="checkAnswer()">Responder</button>
+        </div>
+
+        <button class="btn btn-secondary" id="newQuestionBtn" onclick="newQuestion()">Nova Questão</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="ranking-section">
+        <h2>🏆 Rankings</h2>
+        <div class="ranking-tabs">
+            <button class="tab-btn active" onclick="showRanking('geral')">Geral</button>
+            <button class="tab-btn" onclick="showRanking('escola')">Minha Escola</button>
+        </div>
+        <div id="rankingContent" class="ranking-content">
+            Carregando...
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentAnswer = null;
+    let currentLevel = 'facil';
+
+    document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentLevel = this.dataset.level;
+        });
+    });
+
+    function newQuestion() {
+        fetch('/matematica/questao', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nivel: currentLevel })
+        })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('questionText').textContent = data.questao;
+                document.getElementById('answerSection').style.display = 'block';
+                document.getElementById('answerInput').value = '';
+                document.getElementById('feedback').innerHTML = '';
+                currentAnswer = data.resposta;
+            });
+    }
+
+    function checkAnswer() {
+        const resposta = parseInt(document.getElementById('answerInput').value);
+
+        fetch('/matematica/responder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resposta: resposta })
+        })
+            .then(r => r.json())
+            .then(data => {
+                const feedback = document.getElementById('feedback');
+                feedback.innerHTML = `<div class="alert alert-${data.correto ? 'success' : 'error'}">
+            ${data.mensagem} ${data.correto ? `(+${data.pontos_ganhos} pts)` : ''}
+        </div>`;
+
+                if (data.correto) {
+                    updateScore();
+                }
+            });
+    }
+
+    function updateScore() {
+        fetch('/api/pontuacao')
+            .then(r => r.json())
+            .then(data => {
+                document.querySelector('.score-value').textContent = data.total;
+            });
+    }
+
+    function loadRanking() {
+        fetch('/matematica/ranking')
+            .then(r => r.json())
+            .then(data => {
+                window.rankingData = data;
+                showRanking('geral');
+            });
+    }
+
+    function showRanking(tipo) {
+        const data = window.rankingData[tipo];
+        const container = document.getElementById('rankingContent');
+
+        let html = '<table class="ranking-table"><thead><tr><th>Pos</th><th>Nome</th>';
+        if (tipo === 'geral') html += '<th>Escola</th>';
+        html += '<th>Pontos</th></tr></thead><tbody>';
+
+        data.forEach((item, index) => {
+            html += `<tr>
+            <td>${index + 1}º</td>
+            <td>${item.nome}</td>
+            ${tipo === 'geral' ? `<td>${item.escola}</td>` : ''}
+            <td>${item.total_pontos}</td>
+        </tr>`;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    // Carregar ranking ao iniciar
+    loadRanking();
+</script>
+{% endblock %}

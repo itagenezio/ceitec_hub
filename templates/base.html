@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CEITEC HUB{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.user_id %}
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🚀</span>
+            <span class="brand-text">CEITEC HUB</span>
+        </div>
+        <button class="nav-toggle" onclick="toggleMenu()">☰</button>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="{{ url_for('matematica') }}" class="{% if request.endpoint == 'matematica' %}active{% endif %}">Matemática</a></li>
+            <li><a href="{{ url_for('avaliacao_ia') }}" class="{% if request.endpoint == 'avaliacao_ia' %}active{% endif %}">Avaliação IA</a></li>
+            <li><a href="{{ url_for('robotica') }}" class="{% if request.endpoint == 'robotica' %}active{% endif %}">Robótica</a></li>
+            <li><a href="{{ url_for('relatorios') }}" class="{% if request.endpoint == 'relatorios' %}active{% endif %}">Relatórios</a></li>
+            {% if session.user_type == 'professor' %}
+            <li><a href="{{ url_for('relatorios_professor') }}">Área do Professor</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}" class="btn-logout">Sair</a></li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                        <button onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>© 2024 CEITEC - Centro de Inovação em Tecnologia e Educação do Ceará</p>
+        <p>Desenvolvido para a BNCC de Computação</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

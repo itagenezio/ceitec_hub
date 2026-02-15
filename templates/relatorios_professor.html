@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Área do Professor - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="relatorios-container">
+    <h1>👨‍🏫 Dashboard do Professor</h1>
+
+    <div class="stats-overview">
+        <div class="stat-card">
+            <h3>Total de Alunos</h3>
+            <p class="big-number">{{ stats.usuarios.aluno or 0 }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Atividades Realizadas</h3>
+            <p class="big-number">{{ stats.total_matematica + stats.total_avaliacoes + stats.total_projetos }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Média Matemática</h3>
+            <p class="big-number">{{ stats.media_matematica }}</p>
+        </div>
+    </div>
+
+    <div class="historico-section">
+        <h3>Desempenho por Escola</h3>
+        <table class="historico-table">
+            <thead>
+                <tr>
+                    <th>Escola</th>
+                    <th>Total Alunos</th>
+                    <th>Pontuação Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for escola in escolas %}
+                <tr>
+                    <td>{{ escola.escola }}</td>
+                    <td>{{ escola.total_alunos }}</td>
+                    <td>{{ escola.pontuacao_total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

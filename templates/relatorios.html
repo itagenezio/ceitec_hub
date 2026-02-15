@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Relatórios - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="relatorios-container">
+    <h1>📊 Meu Desempenho</h1>
+
+    <div class="stats-overview">
+        <div class="stat-card">
+            <h3>Posição no Ranking</h3>
+            <p class="big-number">{{ posicao_ranking or '-' }}º</p>
+            <small>de {{ total_alunos }} alunos</small>
+        </div>
+        <div class="stat-card">
+            <h3>Pontuação Total</h3>
+            <p class="big-number">{{ pontuacao_total }}</p>
+            <small>pontos acumulados</small>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3>Desempenho por Módulo</h3>
+            <canvas id="modulosChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3>Histórico Matemática</h3>
+            <canvas id="matematicaChart"></canvas>
+        </div>
+    </div>
+
+    <div class="historico-section">
+        <h3>Últimas Atividades</h3>
+
+        {% if dados_matematica %}
+        <div class="historico-grupo">
+            <h4>🧮 Matemática</h4>
+            <table class="historico-table">
+                <tr>
+                    <th>Data</th>
+                    <th>Nível</th>
+                    <th>Pontos</th>
+                </tr>
+                {% for item in dados_matematica[:5] %}
+                <tr>
+                    <td>{{ item.data_jogo }}</td>
+                    <td>{{ item.nivel }}</td>
+                    <td>+{{ item.pontuacao }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        {% if dados_avaliacao %}
+        <div class="historico-grupo">
+            <h4>🤖 Avaliações IA</h4>
+            <table class="historico-table">
+                <tr>
+                    <th>Data</th>
+                    <th>Nível</th>
+                    <th>Pontos</th>
+                </tr>
+                {% for item in dados_avaliacao[:5] %}
+                <tr>
+                    <td>{{ item.data_avaliacao }}</td>
+                    <td>{{ item.nivel_classificacao }}</td>
+                    <td>+{{ item.pontuacao }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        {% if dados_robotica %}
+        <div class="historico-grupo">
+            <h4>🔧 Projetos de Robótica</h4>
+            <table class="historico-table">
+                <tr>
+                    <th>Projeto</th>
+                    <th>Área</th>
+                    <th>Nota</th>
+                </tr>
+                {% for item in dados_robotica %}
+                <tr>
+                    <td>{{ item.titulo }}</td>
+                    <td>{{ item.area }}</td>
+                    <td>{{ item.nota }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Gráfico de Módulos
+    const ctxModulos = document.getElementById('modulosChart').getContext('2d');
+    new Chart(ctxModulos, {
+        type: 'doughnut',
+        data: {
+            labels: ['Matemática', 'Avaliação IA', 'Robótica'],
+            datasets: [{
+                data: [
+                    {{ (dados_matematica or[]) | sum(attribute = 'pontuacao') }},
+                {{ (dados_avaliacao or[]) | sum(attribute = 'pontuacao') }},
+        {{ (dados_robotica or[]) | sum(attribute = 'nota') }}
+            ],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+    }
+});
+
+    // Gráfico de Histórico Matemática
+    const ctxMat = document.getElementById('matematicaChart').getContext('2d');
+    new Chart(ctxMat, {
+        type: 'line',
+        data: {
+            labels: [{% for item in (dados_matematica or [])[: 7] %}'{{ item.data_jogo[:10] if item.data_jogo else "" }}', {% endfor %}],
+    datasets: [{
+        label: 'Pontuação',
+        data: [{% for item in (dados_matematica or [])[: 7] %}{ { item.pontuacao } }, {% endfor %}],
+    borderColor: '#FF6384',
+        tension: 0.4
+        }]
+    }
+});
+</script>
+{% endblock %}

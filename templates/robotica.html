@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Clube de Robótica - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="robotica-container">
+    <h1>🔧 Clube de Robótica</h1>
+
+    <div class="robotica-grid">
+        <div class="form-section">
+            <h2>Cadastrar Novo Projeto</h2>
+            <form method="POST" action="{{ url_for('cadastrar_projeto') }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="titulo">Título do Projeto</label>
+                    <input type="text" id="titulo" name="titulo" required
+                        placeholder="Ex: Braço Robótico Controlado por Arduino">
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descrição Detalhada</label>
+                    <textarea id="descricao" name="descricao" rows="5" required
+                        placeholder="Descreva seu projeto: objetivos, materiais utilizados, código, desafios superados..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="area">Área</label>
+                        <select id="area" name="area" required>
+                            <option value="Arduino">Arduino</option>
+                            <option value="Scratch">Scratch</option>
+                            <option value="IA">Inteligência Artificial</option>
+                            <option value="Maker">Maker/Criatividade</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nivel">Nível de Complexidade</label>
+                        <select id="nivel" name="nivel" required>
+                            <option value="iniciante">Iniciante</option>
+                            <option value="intermediario">Intermediário</option>
+                            <option value="avancado">Avançado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="imagem">Foto do Projeto</label>
+                    <input type="file" id="imagem" name="imagem" accept="image/*">
+                    <small>Formatos aceitos: JPG, PNG (máx. 16MB)</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Cadastrar Projeto</button>
+            </form>
+        </div>
+
+        <div class="info-section">
+            <h2>Como funciona?</h2>
+            <div class="criteria-box">
+                <h3>Critérios de Avaliação:</h3>
+                <ul>
+                    <li><strong>Criatividade (30%):</strong> Originalidade da ideia</li>
+                    <li><strong>Programação (40%):</strong> Uso de código e lógica</li>
+                    <li><strong>Resolução de Problemas (30%):</strong> Solução proposta</li>
+                </ul>
+                <p class="max-score">Nota máxima: 100 pontos</p>
+            </div>
+
+            <a href="{{ url_for('galeria_robotica') }}" class="btn btn-secondary btn-block">
+                Ver Galeria de Projetos
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

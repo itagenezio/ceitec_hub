@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Avaliação com IA - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="ia-container">
+    <h1>🤖 Avaliação Inteligente</h1>
+    <p class="subtitle">Escreva um texto sobre <strong>Tecnologia e Educação</strong> e receba feedback da nossa IA</p>
+
+    <div class="ia-form">
+        <div class="form-group">
+            <label for="tema">Tema da redação:</label>
+            <select id="tema" class="form-control">
+                <option value="tecnologia">Tecnologia na Educação</option>
+                <option value="robotica">Robótica Educacional</option>
+                <option value="programacao">Programação para Jovens</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="texto">Sua resposta:</label>
+            <textarea id="texto" rows="10" class="form-control"
+                placeholder="Escreva aqui sua resposta... Mínimo recomendado: 50 palavras"></textarea>
+            <small class="word-count" id="wordCount">0 palavras</small>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="submeterAvaliacao()">
+            Analisar com IA
+        </button>
+    </div>
+
+    <div id="resultadoIA" class="resultado-ia" style="display: none;">
+        <div class="nivel-badge" id="nivelBadge"></div>
+        <div class="pontuacao" id="pontuacaoIA"></div>
+        <div class="feedback-text" id="feedbackText"></div>
+        <div class="detalhes" id="detalhesIA"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('texto').addEventListener('input', function () {
+        const words = this.value.trim().split(/\s+/).filter(w => w.length > 0);
+        document.getElementById('wordCount').textContent = words.length + ' palavras';
+    });
+
+    function submeterAvaliacao() {
+        const texto = document.getElementById('texto').value;
+        const tema = document.getElementById('tema').value;
+
+        if (texto.trim().length < 20) {
+            alert('Por favor, escreva pelo menos 20 palavras.');
+            return;
+        }
+
+        const btn = document.querySelector('.btn-primary');
+        btn.disabled = true;
+        btn.textContent = 'Analisando... 🤖';
+
+        fetch('/avaliacao-ia/submeter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto: texto, tema: tema })
+        })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('resultadoIA').style.display = 'block';
+                document.getElementById('nivelBadge').textContent = data.nivel;
+                document.getElementById('nivelBadge').className = 'nivel-badge nivel-' + data.nivel.toLowerCase();
+                document.getElementById('pontuacaoIA').textContent = data.pontuacao + '/100 pontos';
+                document.getElementById('feedbackText').textContent = data.feedback;
+
+                let detalhesHtml = '<h4>Detalhes da análise:</h4><ul>';
+                data.detalhes.forEach(d => {
+                    detalhesHtml += `<li>${d}</li>`;
+                });
+                detalhesHtml += '</ul>';
+                detalhesHtml += `<p><strong>Estatísticas:</strong> ${data.estatisticas.palavras} palavras, 
+                        ${data.estatisticas.frases} frases, 
+                        ${data.estatisticas.termos_tecnicos} termos técnicos</p>`;
+
+                document.getElementById('detalhesIA').innerHTML = detalhesHtml;
+
+                btn.disabled = false;
+                btn.textContent = 'Analisar com IA';
+
+                updateScore();
+            });
+    }
+</script>
+{% endblock %}

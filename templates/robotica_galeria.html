@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Galeria de Projetos - CEITEC HUB{% endblock %}
+
+{% block content %}
+<div class="galeria-container">
+    <h1>🎨 Galeria de Projetos</h1>
+
+    <div class="filtros">
+        <button class="filter-btn active" onclick="filterProjects('all')">Todos</button>
+        <button class="filter-btn" onclick="filterProjects('Arduino')">Arduino</button>
+        <button class="filter-btn" onclick="filterProjects('Scratch')">Scratch</button>
+        <button class="filter-btn" onclick="filterProjects('IA')">IA</button>
+        <button class="filter-btn" onclick="filterProjects('Maker')">Maker</button>
+    </div>
+
+    <div class="projetos-grid" id="projetosGrid">
+        {% for projeto in projetos %}
+        <div class="projeto-card" data-area="{{ projeto.area }}">
+            <div class="projeto-imagem">
+                {% if projeto.imagem %}
+                <img src="{{ url_for('static', filename=projeto.imagem) }}" alt="{{ projeto.titulo }}">
+                {% else %}
+                <div class="no-image">📷 Sem imagem</div>
+                {% endif %}
+            </div>
+            <div class="projeto-info">
+                <span class="area-badge area-{{ projeto.area.lower() }}">{{ projeto.area }}</span>
+                <h3>{{ projeto.titulo }}</h3>
+                <p class="autor">por {{ projeto.autor }} - {{ projeto.escola }}</p>
+                <p class="descricao">{{ projeto.descricao[:100] }}...</p>
+                <div class="projeto-footer">
+                    <span class="nivel">{{ projeto.nivel }}</span>
+                    <span class="nota">⭐ {{ projeto.nota }}/100</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function filterProjects(area) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        document.querySelectorAll('.projeto-card').forEach(card => {
+            if (area === 'all' || card.dataset.area === area) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

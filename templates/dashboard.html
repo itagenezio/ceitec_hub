@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="user-welcome">
+        <h1>Olá, {{ user.nome }}! 👋</h1>
+        <p>{{ user.escola }} • {{ user.serie }}</p>
+    </div>
+    <div class="score-display">
+        <span class="score-label">Pontuação Total</span>
+        <span class="score-value">{{ stats.total }}</span>
+    </div>
+</div>
+
+<div class="modules-grid">
+    <a href="{{ url_for('matematica') }}" class="module-card math">
+        <div class="module-icon">🧮</div>
+        <h3>Competição Matemática</h3>
+        <p>Pratique cálculos e suba no ranking</p>
+        <div class="module-score">{{ stats.matematica }} pts</div>
+    </a>
+
+    <a href="{{ url_for('avaliacao_ia') }}" class="module-card ai">
+        <div class="module-icon">🤖</div>
+        <h3>Avaliação Inteligente</h3>
+        <p>Escreva e receba feedback da IA</p>
+        <div class="module-score">{{ stats.avaliacao_ia }} pts</div>
+    </a>
+
+    <a href="{{ url_for('robotica') }}" class="module-card robotics">
+        <div class="module-icon">🔧</div>
+        <h3>Clube de Robótica</h3>
+        <p>Cadastre projetos e veja a galeria</p>
+        <div class="module-score">{{ stats.robotica }} pts</div>
+    </a>
+
+    <a href="{{ url_for('relatorios') }}" class="module-card reports">
+        <div class="module-icon">📊</div>
+        <h3>Relatórios</h3>
+        <p>Acompanhe seu desempenho</p>
+        <div class="module-score">Ver mais</div>
+    </a>
+</div>
+
+{% if user.tipo == 'professor' %}
+<div class="teacher-section">
+    <h2>Área do Professor</h2>
+    <a href="{{ url_for('relatorios_professor') }}" class="btn btn-secondary">
+        Ver Estatísticas Gerais
+    </a>
+</div>
+{% endif %}
+{% endblock %}
