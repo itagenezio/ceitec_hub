@@ -442,6 +442,9 @@ def api_pontuacao():
         'robotica': db.get_pontuacao_modulo(session['user_id'], 'robotica')
     })
 
+# Mova o db.init_db() para fora do if, logo abaixo de onde o db é criado
+db = Database()
+db.init_db() # <--- Adicione aqui!
+
 if __name__ == '__main__':
-    db.init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
